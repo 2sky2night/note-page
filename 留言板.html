@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            outline: none;
+        }
+
+        body {
+            height: 100vh;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            background-color: rgb(135, 171, 249);
+        }
+
+        #main {
+            height: 700px;
+            width: 1500px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, 250px);
+            grid-template-rows: repeat(auto-fill, 250px);
+            grid-column-gap: 50px;
+            grid-row-gap: 20px;
+            box-sizing: border-box;
+            padding: 20px;
+            overflow: auto;
+        }
+
+        /* 便签通用样式 */
+        #newText,
+        .userText {
+            background-color: #fff;
+            width: 280px;
+            height: 250px;
+            margin-right: 25px;
+            border-radius: 3%;
+            box-sizing: border-box;
+            padding: 12px;
+        }
+
+        /* 新笔记盒子 */
+        #newText {
+            color: rgb(135, 171, 249);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
+        }
+
+        #newText div {
+            font-size: 50px;
+            width: 80px;
+            height: 80px;
+            text-align: center;
+            border: 2px rgb(135, 171, 249) dashed;
+            border-radius: 50%;
+            line-height: 75px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: .5s;
+        }
+
+        #newText div:hover {
+            color: skyblue;
+            border-color: skyblue;
+        }
+
+        #newText p {
+            font-weight: 1000;
+        }
+
+        /* 用户的笔记样式 */
+        div.userText h3 {
+            height: 30px;
+        }
+
+        /*笔记主要内容*/
+        div.mainText {
+            font-size: 15px;
+            color: rgb(69, 77, 85);
+            height: 160px;
+            width: 100%;
+            overflow-wrap: break-word;
+            /*超出元素宽度就自动换行*/
+            overflow-y: auto;
+            transition: .5s;
+        }
+
+        /*下方日期和功能按钮盒子*/
+        div.bottom {
+            border-top: 1px rgb(179, 197, 214) solid;
+            height: 60px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+
+        div.bottom>p {
+            line-height: 40px;
+            font-size: 15px;
+            font-weight: 1000;
+        }
+
+        /* 功能按钮 */
+        div.function {
+            top: 15px;
+            position: relative;
+            font-weight: 1000;
+            cursor: pointer;
+            height: 15px;
+            width: 30px;
+            line-height: 5px;
+            text-align: center;
+        }
+
+
+        /* 功能列表  */
+        .function-list {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            position: absolute;
+            line-height: initial;
+            background-color: #fff;
+            width: 100px;
+            height: 80px;
+            text-align: center;
+            box-shadow: 1px 5px 10px rgba(0, 0, 0, .3);
+            top: -70px;
+            left: -70px;
+            box-sizing: border-box;
+            padding: 10px 0;
+            display: none;
+        }
+
+        .function-list div {
+            flex-grow: 1;
+            line-height: 30px;
+        }
+
+        /* 功能列表鼠标悬浮时  */
+        .function-list div:hover {
+            background-color: rgba(192, 192, 192, 0.429);
+        }
+
+        /*创建日记的大盒子*/
+        #create_box {
+            /*参照对象是根标签，让该标签覆盖网页的全部位置 */
+            position: absolute;
+            right: 0;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.415);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            display: none;
+            z-index: 100;
+        }
+
+        /*创建日记的主面板*/
+        #userCreatBox {
+            background-color: #fff;
+            width: 400px;
+            height: 500px;
+            border-radius: 2%;
+        }
+
+
+        /*标题和关闭按钮*/
+        #userCreatBox>div:first-child {
+            height: 60px;
+            box-sizing: border-box;
+            padding: 20px;
+            border-bottom: 1px rgb(179, 197, 214) solid;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 17px;
+        }
+
+        /*关闭按钮*/
+        #userCreatBox>div:first-child>div {
+            cursor: pointer;
+            font-size: 25px;
+            font-weight: 1000;
+            margin-right: 10px;
+            transition: .5s;
+        }
+
+        #userCreatBox>div:first-child>div:hover {
+            color: rgb(255, 17, 0);
+        }
+
+
+        /*标题和内容*/
+        #userCreatBox>div:nth-child(2) {
+            height: 360px;
+            box-sizing: border-box;
+            padding: 20px;
+        }
+
+        /*标题和内容的通用样式*/
+        #userCreatBox>div:nth-child(2)>input,
+        #userCreatBox textarea {
+            margin-top: 10px;
+            width: 100%;
+            box-sizing: border-box;
+            padding-left: 10px;
+            padding-right: 10px;
+            margin-bottom: 10px;
+            font-family: "微软雅黑";
+        }
+
+
+        #userCreatBox>div:nth-child(2)>input {
+            height: 40px;
+        }
+
+
+        /*内容*/
+        #userCreatBox textarea {
+            padding-top: 15px;
+            resize: none;
+            height: 200px;
+        }
+
+
+        /*按钮*/
+        #userCreatBox>div:last-child {
+            box-sizing: border-box;
+            padding: 0 20px;
+            height: 80px;
+        }
+
+        #userCreatBox>div:last-child button {
+            width: 100%;
+            color: white;
+            background-color: rgb(135, 152, 249);
+            border: none;
+            height: 50px;
+            font-size: 20px;
+            cursor: pointer;
+            transition: .5s;
+        }
+
+        #userCreatBox>div:last-child button:hover {
+            background-color: rgb(135, 192, 249);
+        }
+    </style>
+    <script>
+        window.addEventListener("DOMContentLoaded", () => {
+
+            //所有的便签盒子
+            const noteList = document.getElementsByClassName("userText");
+            //所有的功能操作按钮
+            const funcList = document.getElementsByClassName("function");
+            //所有的删除按钮
+            const delList = document.getElementsByClassName("del");
+            //所有的编辑按钮
+            const editList = document.getElementsByClassName("edit");
+            //创建、修改便签
+            const createBox = document.getElementById("create_box");
+            //新便签盒子
+            const newText = document.getElementById("newText");
+            //创建便签按钮
+            const newBt = newText.firstElementChild;
+            //关闭创建便签按钮
+            const closeBt = document.getElementById('closeBox');
+            //是由哪个留言板发起的修改变量，默认-1
+            let updateIndex = -1;
+            //获取标题和内容
+            const Tiltle = document.getElementById("user_title");
+            const textArea = document.getElementById("user_main");
+            //完成按钮
+            const commitBt = document.getElementById("commit");
+            //总便签盒子
+            const mainBox = document.getElementById("main");
+
+            //使用事件委派
+            document.addEventListener("click", function (event) {
+
+                //将功能操作按钮转换成数组
+                const funcArray = Array.from(funcList);
+                //若单击功能，显示功能面板
+                if (funcArray.indexOf(event.target) != -1)
+                    event.target.firstElementChild.style.display = "flex";
+                //若点击功能后点击其他地方就不显示功能面板
+                else {
+                    for (let ele of funcList)
+                        ele.firstElementChild.style.display = "none";
+                }
+
+
+                //将删除操作按钮转换成数组
+                const delArray = Array.from(delList);
+                if (delArray.indexOf(event.target) != -1)
+                    if (confirm("真的删除该便条吗？"))
+                        event.target.parentElement.parentElement.parentElement.parentElement.remove();
+
+                //编辑功能，要先知道是哪一个便签要修改，设置提出修改的便签索引
+                const editArray = Array.from(editList);
+                if (editArray.indexOf(event.target) != -1) {
+                    //获取当前的所有便签数组
+                    const noteArray = Array.from(noteList);
+                    for (let i = 0; i < noteArray.length; i++) {
+                        //获取当前触发事件的便签在数组中的索引
+                        if (event.target.parentElement.parentElement.parentElement.parentElement ===noteArray[i]) {
+                            updateIndex = i;
+                            break;
+                        }
+                    }
+
+
+                    //点击编辑时，让当前便签文本自动填充到编辑面板中
+                    createBox.querySelector("input").value = event.target.parentElement.parentElement.parentElement.parentElement.firstElementChild.innerText;
+                    createBox.querySelector("textarea").value = event.target.parentElement.parentElement .parentElement.parentElement.querySelector(".mainText").innerText
+                    createBox.style.display = "flex";
+                }
+
+            })
+
+
+
+
+            //点击显示编辑功能，并且将当前面板置为-1;
+            newBt.addEventListener("click", () => {
+                updateIndex = -1;
+                createBox.style.display = "flex";
+            });
+
+            //点击关闭编辑面板，且清空当前编辑面板的所有内容
+            closeBt.addEventListener("click", () => {
+                createBox.style.display = "none";
+                Tiltle.value = "";
+                textArea.value = "";
+            });
+
+            commitBt.addEventListener("click", function updateNote(event) {
+                //获取标题和内容的值
+                let creatFlag=true;
+                const titleValue = Tiltle.value;
+                const MainValue = textArea.value;
+                if (titleValue &&MainValue) {
+                    //判断是否是创建面板还是修改面板
+                    if (updateIndex === -1) //创建面板
+                    {
+                        //创建一个面板的所有所需的标签，并且都要设置class的值，否则css样式会失效
+                        //最外层的盒子
+                        const userTextBox = document.createElement("div");
+                        userTextBox.setAttribute("class", "userText");
+
+                        //子元素
+                        //标题
+                        const h3Box = document.createElement("h3");
+                        h3Box.innerText = titleValue;
+                        //主要内容
+                        const mainTextBox = document.createElement("div");
+                        mainTextBox.setAttribute('class', "mainText");
+                        mainTextBox.innerText = MainValue;
+
+                        //下方按钮和时间的盒子
+                        const bottomBox = document.createElement("div");
+                        bottomBox.setAttribute("class", "bottom");
+
+                        //按钮的子元素
+
+                        //时间标签
+                        const timeBox = document.createElement("p");
+                        timeBox.innerText = new Date().toLocaleString();
+
+                        //功能标签
+                        const funBox = document.createElement("div");
+                        funBox.classList.add("function");
+                        funBox.innerText = "...";
+
+                        //按钮的子元素的子元素
+                        const funListBox = document.createElement("div");
+                        funListBox.classList.add("function-list");
+                        //按钮的子元素的子元素的子元素
+                        const editBox = document.createElement("div");
+                        editBox.innerText = "编辑";
+                        editBox.classList.add("edit");
+                        const delBox = document.createElement("div");
+                        delBox.innerText = "删除";
+                        delBox.classList.add("del");
+
+                        //从里向外添加
+                        funListBox.insertAdjacentElement("beforeend", editBox);
+                        funListBox.insertAdjacentElement("beforeend", delBox);
+
+                        funBox.appendChild(funListBox);
+                        bottomBox.insertAdjacentElement("beforeend", timeBox);
+                        bottomBox.insertAdjacentElement("beforeend", funBox);
+                        userTextBox.insertAdjacentElement("beforeend", h3Box);
+                        userTextBox.insertAdjacentElement("beforeend", mainTextBox);
+                        userTextBox.insertAdjacentElement("beforeend", bottomBox);
+                        //最后添加到便签盒子里面
+                        mainBox.insertAdjacentElement("beforeend", userTextBox);
+                    } else {
+                        //修改面板，根据索引找到要修改的面板
+                        const noteArray = Array.from(noteList); //当前所有的便签数组
+                        const updateBox = noteArray.at(updateIndex); //通过当前发起修改的节点索引值来获取对象 
+                        updateBox.querySelector("h3").innerText = titleValue;
+                        updateBox.querySelector(".mainText").innerText = MainValue;
+                        updateBox.querySelector("p").innerText = new Date().toLocaleString();
+                    }
+                }
+                else{
+                    creatFlag=!creatFlag;//创建失败，不关闭当前面板
+                    alert("标题和内容不能为空!");
+                }
+                
+
+                if(creatFlag)
+                {//恢复编辑面板的所有值
+                Tiltle.value = "";
+                textArea.value = "";
+                createBox.style.display = "none";
+                }
+            })
+
+        })
+    </script>
+</head>
+
+<body>
+    <div id="main">
+        <div id="newText">
+            <div>+</div>
+            <p>Add new note</p>
+        </div>
+
+
+        <div class="userText">
+            <h3>日志</h3>
+            <div class="mainText">
+                小日子还不错嘛
+            </div>
+            <div class="bottom">
+                <p>2022/9/20 10:55:47</p>
+                <div class="function">...
+                    <div class="function-list">
+                        <div class="edit">编辑</div>
+                        <div class="del">删除</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div id="create_box">
+            <div id="userCreatBox">
+                <div>
+                    <h3>更新笔记</h3>
+                    <div id="closeBox">x</div>
+                </div>
+                <div>
+                    <h3>标题</h3>
+                    <input type="text" id="user_title">
+                    <h3>内容</h3>
+                    <textarea id="user_main"></textarea>
+                </div>
+                <div>
+                    <button id="commit">完成</button>
+                </div>
+            </div>
+        </div>
+
+
+
+    </div>
+</body>
+
+</html>
